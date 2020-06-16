@@ -2,32 +2,32 @@ from PIL import Image
 import numpy as np
 import vectormath as vmath
 import math
+from sphere import Sphere
 
 h, w = 100, 100
 image = np.ndarray((w, h, 3), dtype=np.uint8)
 origin = vmath.Vector3(0, 0, 0)
 resolution = vmath.Vector2(w, h)
 
-sphere = vmath.Vector3(0, 0, 4)
-radius = 1.0
+sphere = Sphere(0, 0, 4, 1.0)
 
 def normalize(min_val, max_val, val):
     return (val - min_val) / (max_val - min_val)
 
 
 def get_color(ray):
-    distance = (sphere - origin).dot(ray)
+    distance = (sphere.center - origin).dot(ray)
     point = origin + (ray * distance)
 
-    y = (sphere - point).length
-    if(y < radius):
-        x = math.sqrt(radius*radius - y*y)
+    y = (sphere.center - point).length
+    if(y < sphere.radius):
+        x = math.sqrt(sphere.radius * sphere.radius - y*y)
 
         t1 = distance - x
         t2 = distance + x
 
-        sphere_t = sphere.length
-        intensity = normalize(sphere_t, sphere_t - radius, t1)
+        sphere_t = (sphere.center - origin).length
+        intensity = normalize(sphere_t, sphere_t - sphere.radius, t1)
         return [255 * intensity, 255 * intensity, 255 * intensity]
     return [0, 0, 0]
 
