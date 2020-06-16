@@ -4,30 +4,40 @@ import vectormath as vmath
 import math
 from sphere import Sphere
 
-h, w = 100, 100
+h, w = 800, 600
 image = np.ndarray((w, h, 3), dtype=np.uint8)
 origin = vmath.Vector3(0, 0, 0)
 resolution = vmath.Vector2(w, h)
 
-sphere = Sphere(0, 0, 4, 1.0)
+sphere1 = Sphere(0, 0, 4, 1.0)
+sphere2 = Sphere(1.3, 1.3, 8, 1.0)
+
+spheres = [sphere1, sphere2]
 
 def normalize(min_val, max_val, val):
     return (val - min_val) / (max_val - min_val)
 
 
 def get_color(ray):
-    distance = (sphere.center - origin).dot(ray)
-    point = origin + (ray * distance)
 
-    y = (sphere.center - point).length
-    if(y < sphere.radius):
-        x = math.sqrt(sphere.radius * sphere.radius - y*y)
+    distances = []
+    for s in spheres:
+        distances.append(s.intesect(origin, ray))
+    
+    min_distance = None
 
-        t1 = distance - x
-        t2 = distance + x
+    for d in distances:
+        if(d is not None):
+            if(min_distance is None or d[0] < min_distance[0]):
+                min_distance = d
+           
+    if(min_distance is not None):
+        t1 = min_distance[0]
+        t2 = min_distance[1]
+        sphere_t_min = min_distance[2]
+        sphere_t_max = min_distance[3]
 
-        sphere_t = (sphere.center - origin).length
-        intensity = normalize(sphere_t, sphere_t - sphere.radius, t1)
+        intensity = normalize(sphere_t_min, sphere_t_max, t1)
         return [255 * intensity, 255 * intensity, 255 * intensity]
     return [0, 0, 0]
 
